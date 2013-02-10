@@ -20,8 +20,13 @@ depend: .depend
 
 -include .depend
 
+%.o: %.cc
+	$(info Compiling: $< -> $@)	
+	@ $(CXX) $(CXXFLAGS) -o $@ -c $<
+
 $(OUTPUT): $(OBJECTS)
-	$(CXX) -o $@ $^  $(CXXFLAGS) $(CXXLIBS)
+	$(info Linking: $@)
+	@$(CXX) -o $@ $^  $(CXXFLAGS) $(CXXLIBS)
 
 clean:
-	rm -rf $(OBJECTS) $(PROGRAM) .depend
+	@rm -rf $(OBJECTS) $(PROGRAM) .depend
