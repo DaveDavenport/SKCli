@@ -22,7 +22,7 @@ int Stuffkeeper::CLI::run( int argc, char ** argv )
         {
             for(int j = 0; j < this->num_modules; j++)
             {
-                cout << this->modules[j].get_name() << " " << endl;
+                cout << this->modules[j]->get_name() << " " << endl;
             }
             return 0;
         }
@@ -32,10 +32,10 @@ int Stuffkeeper::CLI::run( int argc, char ** argv )
          */
         for(int j = 0; j < this->num_modules; j++)
         {
-            if(this->modules[j].get_name() == command)
+            if(this->modules[j]->get_name() == command)
             {
-                cout << "Module: "<< this->modules[j].get_name() << endl;
-                return this->modules[j].run(argc-1,&argv[1]);
+                cout << "Module: "<< this->modules[j]->get_name() << endl;
+                return this->modules[j]->run(argc-2,&argv[2]);
             }
         }
     }

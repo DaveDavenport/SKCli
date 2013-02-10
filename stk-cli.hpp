@@ -13,9 +13,9 @@ namespace Stuffkeeper
         private:
 			const int num_modules = 2;
 			// Modules
-			Module modules[2] = {
-				List(this),
-				Add(this)
+			Module *modules[2] = {
+				new List(this),
+				new Add(this)
 			};
     
         public:

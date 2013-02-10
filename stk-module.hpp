@@ -1,6 +1,6 @@
 #ifndef __STK_MODULE_HPP__
 #define __STK_MODULE_HPP__
-
+#include <iostream>
 #include <string>
 
 /**
@@ -34,7 +34,10 @@ namespace Stuffkeeper
 			/**
 			 * Run function.
 			 */
-			virtual int run ( int argc, char **argv ) { return 0; }
+			virtual int run ( int argc, char **argv ) { 
+				std::cout << "Module: run not implemented" << std::endl;
+				return 0; 
+			}
 	};
 }
 

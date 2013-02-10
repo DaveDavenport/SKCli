@@ -16,6 +16,7 @@ namespace Stuffkeeper
 
 			}
 
+		virtual int run ( int argc, char **argv );
 	};
 }
 
