@@ -13,13 +13,6 @@ int main ( int argc, char **argv )
     return stk.run(argc, argv);
 }
 
-
-int Stuffkeeper::List::run( int argc, char **argv )
-{
-
-    return 0;
-}
-
 int Stuffkeeper::CLI::run( int argc, char ** argv )
 {
     if( argc < 2)
