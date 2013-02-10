@@ -1,5 +1,5 @@
 #include <iostream>
-#include "stk-cli.hpp"
+#include "stk.hpp"
 
 using namespace std;
 using namespace Stuffkeeper;

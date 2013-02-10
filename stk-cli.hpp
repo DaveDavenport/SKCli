@@ -2,9 +2,7 @@
 #define __STK_CLI_H__
 
 #include <string>
-#include "stk-module.hpp"
-#include "stk-list.hpp"
-#include "stk-add.hpp"
+#include "stk.hpp"
 
 namespace Stuffkeeper
 {

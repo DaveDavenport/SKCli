@@ -1,6 +1,8 @@
 #ifndef __STK_LIST_HPP__
 #define __STK_LIST_HPP__
+
 #include <string>
+
 #include "stk-module.hpp"
 
 namespace Stuffkeeper
