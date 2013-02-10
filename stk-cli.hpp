@@ -4,16 +4,18 @@
 #include <string>
 #include "stk-module.hpp"
 #include "stk-list.hpp"
+#include "stk-add.hpp"
 
 namespace Stuffkeeper
 {
     class CLI 
     {
         private:
-			const int num_modules = 1;
+			const int num_modules = 2;
 			// Modules
-			Module modules[1] = {
-				List(this)
+			Module modules[2] = {
+				List(this),
+				Add(this)
 			};
     
         public:
