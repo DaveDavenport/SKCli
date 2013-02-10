@@ -28,21 +28,34 @@ int Stuffkeeper::CLI::run( int argc, char ** argv )
     }
     else
     {
+        /* get the command */
         std::string command = argv[1];
+       
+        /**
+         * Auto complete.
+         */ 
+        if(command == "--complete" )
+        {
+            for(int j = 0; j < this->num_modules; j++)
+            {
+                cout << this->modules[j].get_name() << " " << endl;
+            }
+            return 0;
+        }
 
         /**
          * Command parser
          */
-        if(command == "list") 
+        for(int j = 0; j < this->num_modules; j++)
         {
-            cout << "Stuffkeeper::list" << endl;
-            list.run(argc-1, argv+1);
-        }
-        else if (command == "add")
-        {
-          
+            if(this->modules[j].get_name() == command)
+            {
+                cout << "Module: "<< this->modules[j].get_name() << endl;
+                return this->modules[j].run(argc-1,&argv[1]);
+            }
         }
     }
 
     return 0;
 }
+

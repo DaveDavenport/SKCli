@@ -1,30 +1,20 @@
 #ifndef __STK_CLI_H__
 #define __STK_CLI_H__
 
+#include <string>
+#include "stk-module.hpp"
+
 namespace Stuffkeeper
 {
 	// Forward declr.
 	class CLI;
 	
-	class Module
-	{
-		protected:
-			CLI *cli;
-		
-		Module(CLI *cli):
-			cli(cli)
-		{
 
-		}
-
-
-	};
-
-	class List : Module
+	class List : public Module
 	{
 		public:
 		List(CLI *cli):
-			Module(cli)
+			Module(cli, "list")
 		{
 
 		}
@@ -36,8 +26,11 @@ namespace Stuffkeeper
     class CLI 
     {
         private:
+			const int num_modules = 1;
 			// Modules
-			List list = List(this);
+			Module modules[1] = {
+				List(this)
+			};
     
         public:
             int run ( int argc, char **argv);
