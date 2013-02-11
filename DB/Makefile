@@ -1,7 +1,7 @@
 CXXFLAGS+=-std=c++11 -Wall
 
 SOURCES=$(wildcard *.cc)
-OUTPUT=stkcli
+OUTPUT=libstk-db.a
 
 OBJECTS=$(SOURCES:%.cc=%.o)
 
@@ -9,19 +9,7 @@ OBJECTS=$(SOURCES:%.cc=%.o)
 all: $(OUTPUT)
 
 
-##
-# Include headers directory
-##
-CXXFLAGS+=-IHeaders/
-
-CXXLIBS+=-LDB/ -lstk-db
-
-
-# Database
-.PHONY: DB
-DB:
-	make -C DB/
-
+CXXFLAGS+=-I../Headers/
 
 
 ##
@@ -40,10 +28,9 @@ depend: .depend
 	$(info Compiling: $< -> $@)	
 	@ $(CXX) $(CXXFLAGS) -o $@ -c $<
 
-$(OUTPUT): $(OBJECTS) DB
+$(OUTPUT): $(OBJECTS)
 	$(info Linking: $@)
-	@$(CXX) -o $@ $(OBJECTS)  $(CXXFLAGS) $(CXXLIBS)
+	@$(AR) rcs $@ $^ 
 
 clean:
-	$(MAKE) -C DB/ clean
 	@rm -rf $(OBJECTS) $(OUTPUT) .depend

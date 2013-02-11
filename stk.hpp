@@ -2,7 +2,7 @@
 #define __STUFFKEEPER_H__
 
 #include "stk-module.hpp"
-#include "stk-database.hpp"
+#include <DB/stk-database.hpp>
 
 
 
