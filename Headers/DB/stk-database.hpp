@@ -5,44 +5,12 @@
 #include <list>
 #include <stdint.h>
 
+#include <DB/stk-database-type.hpp>
+#include <DB/stk-database-tag.hpp>
+#include <DB/stk-database-item.hpp>
+
 namespace Stuffkeeper
 {
-	class Type
-	{
-		private:
-			// 0 means invalid.
-			uint32_t	uid = 0; 
-			std::string	name = "n/a";
-
-		public:
-			std::string &get_name() {return name;}
-            // Constructor
-            Type(uint32_t uid):
-                uid(uid)
-            {
-
-            }
-	};
-	class Tag
-	{
-		private:
-			// 0 means invalid.
-			uint32_t	uid = 0; 
-			std::string	name = "n/a";
-		public:
-			std::string &get_name() {return name;}
-
-	};
-
-	class Item 
-	{
-		private:
-			// 0 means invalid.
-			uint32_t	uid = 0; 
-		public:
-
-	};
-
 	class Database
 	{
 
@@ -67,8 +35,6 @@ namespace Stuffkeeper
 		 * @returns a std::list with Tag objects.
 		 */
 		std::list<Tag&> &get_tags();
-
-
 	};
 }
 
