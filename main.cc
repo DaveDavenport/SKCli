@@ -10,7 +10,9 @@ using namespace Stuffkeeper;
  */
 int main ( int argc, char **argv )
 {
-    Stuffkeeper::CLI stk;
+    Stuffkeeper::Database db;
+
+    Stuffkeeper::CLI stk(&db);
 
     return stk.run(argc, argv);
 }

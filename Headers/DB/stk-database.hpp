@@ -16,7 +16,12 @@ namespace Stuffkeeper
 
 		public:
 			std::string &get_name() {return name;}
+            // Constructor
+            Type(uint32_t uid):
+                uid(uid)
+            {
 
+            }
 	};
 	class Tag
 	{
@@ -42,13 +47,18 @@ namespace Stuffkeeper
 	{
 
 		public:
+        /**
+         * Constructor.
+         */
+        Database();
+
 		/**
 		 * Get a list of the available types in the 
 		 * database.
 		 * 
 		 * @returns a std::list with Type objects.
 		 */
-		std::list<Type&> &get_types();
+		std::list<Type*> get_types();
 
 		/**
 		 * Get a list of the available tags in the 
