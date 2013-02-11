@@ -20,7 +20,7 @@ CXXLIBS+=-LDB/ -lstk-db
 # Database
 .PHONY: DB
 DB:
-	make -C DB/
+	$(MAKE) -C DB/
 
 
 
