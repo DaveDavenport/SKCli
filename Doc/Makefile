@@ -11,4 +11,4 @@ $(BUILD_DIR_HTML)%.html: %.txt $(BUILD_DIR_HTML)
 	asciidoc -o $@ $<
 
 clean:
-	rm -rf $(HTML_SOURCES)
+	@rm -rf $(HTML_SOURCES)

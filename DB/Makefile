@@ -9,6 +9,7 @@ OUTPUT=$(BUILD_DIR)$(LIB_PREFIX).a
 
 OBJECTS=$(SOURCES:%.cc=$(BUILD_DIR_OBJECTS)$(LIB_PREFIX)%.o)
 
+NODEPS:=clean
 
 all: $(OUTPUT)
 
@@ -28,7 +29,11 @@ $(BUILD_DIR_OBJECTS)$(LIB_PREFIX)%.d: %.cc $(BUILD_DIR_OBJECTS)
 	$(info Finding dependencies: $<)
 	@$(CXX) $(CXXFLAGS) -MM -MF $@ -MT $(@:%.d=%.o)  $<
 
+ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
+    #Chances are, these files don't exist.  GMake will create them and
+    #clean up automatically afterwards
 -include $(DEPEND_FILES)
+endif
 
 $(BUILD_DIR_OBJECTS)$(LIB_PREFIX)%.o: %.cc
 	$(info Compiling: $< -> $@)	
