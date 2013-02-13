@@ -1,0 +1,87 @@
+Console Stuffkeeper
+===================
+:Author: Qball Cow <qball@qballcow.nl>
+
+
+The base idea
+-------------
+
+Lately I find the console to be more useful then GUIs.
+Therefor I decided to write a CLI version of the tool.
+It will be based on Task Warrior.
+
+The SK world exists of the following elements:
+
+* *Type*: Specification of an item.
+* *Item*: An instance of a type.
+* *Tag*:  A identifier that items can be associated to.
+
+So, an Item is an instance of a Type and can be associated with one or more Tags.
+
+Type
+----
+
+A type described what fields are allows in the type. 
+While technically there is no reason to limit the fields of an Item to a fixed set, it is 
+in place to enforce order.
+
+How to create a type using the CLI is not yet clear. The idea is that you need to 
+specify a set of fields, order of the fields and the type (number, text, date, boolean, etc.).
+
+
+Item
+----
+
+An item is based on a 'type', the 'type' specifies witch fields it has.
+A item can have 'tags' attached.
+
+An item consists of the following default fields:
+
+[width="50%",cols="1,2", options="header"]
+|=====================================
+| Field              | Description
+| UID                | A unique id to identify the item
+| Creation date      | Timestamp when item was created.
+| Modification date  | Timestamp the item was last edited.
+| Title              | The title of item, this could be markup string with key elements.
+|=====================================
+
+The rest of the fields are defined by 'type'.
+
+
+Tag
+---
+
+Items can be searched,filtered based on tags.
+
+An example of a tag could be: Jazz, MusicBox1, Gadget, etc.
+
+Tags can be renamed and removed (if no longer linked to an item).
+
+
+Proposed API
+------------
+
+Adding an item
+~~~~~~~~~~~~~~
+
+To add an item you need to specify a name and a type.
+The command looks like:
+
+[source,bash]
+--------------
+skcli add <type> <name> +<tag> +<tag>
+--------------
+
+On addition the item gets a unique id and the creation date is set.
+
+Setting type specific options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can set properties, using the set-property command. 
+The '<key>' should be part of the type.
+
+[source,bash]
+----------------
+skcli set-property <uid> <key>:<value>
+----------------

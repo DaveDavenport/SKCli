@@ -17,11 +17,16 @@ CXXFLAGS+=-IHeaders/
 CXXLIBS+=-LDB/ -lstk-db
 
 
+##
 # Database
+##
 .PHONY: DB
 DB:
 	$(MAKE) -C DB/
 
+.PHONY: doc
+doc:
+	$(MAKE) -C Doc/
 
 
 ##
@@ -36,6 +41,9 @@ depend: .depend
 
 -include .depend
 
+##
+# Compiling
+##
 %.o: %.cc
 	$(info Compiling: $< -> $@)	
 	@ $(CXX) $(CXXFLAGS) -o $@ -c $<
@@ -46,4 +54,8 @@ $(OUTPUT): $(OBJECTS) DB
 
 clean:
 	$(MAKE) -C DB/ clean
+	$(MAKE) -C Doc/ clean
 	@rm -rf $(OBJECTS) $(OUTPUT) .depend
+
+
+
