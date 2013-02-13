@@ -1,12 +1,15 @@
+MAKEFLAGS=--no-print-directory
+
 CXXFLAGS+=-std=c++11 -Wall
 
 SOURCES=$(wildcard *.cc)
 OUTPUT=stkcli
 
-OBJECTS=$(SOURCES:%.cc=%.o)
+OBJECTS=$(SOURCES:%.cc=$(BUILD_DIR)%.o)
 
+BUILD_DIR=build/
 
-all: $(OUTPUT)
+all: $(BUILD_DIR)$(OUTPUT)
 
 
 ##
@@ -29,33 +32,36 @@ doc:
 	$(MAKE) -C Doc/
 
 
+build:
+	$(info Create build directory)
+	@mkdir -p $(BUILD_DIR)
+
 ##
 # Header tracking.
 ##
-depend: .depend
+DEPEND_FILES=$(OBJECTS:%.o=%.d)
 
-.depend: $(SOURCES)
-	$(info Calculating dependencies for: $^)
-	@rm -f $@
-	@$(CXX) $(CXXFLAGS) -MM $^ > $@ 
+$(BUILD_DIR)%.d: %.cc  build
+	$(info Finding dependencies: $<)
+	@$(CXX) $(CXXFLAGS) -MM -MF $@ -MT $(@:%.d=%.o)  $<
 
--include .depend
+-include $(DEPEND_FILES)
 
 ##
 # Compiling
 ##
-%.o: %.cc
+$(BUILD_DIR)%.o: %.cc
 	$(info Compiling: $< -> $@)	
 	@ $(CXX) $(CXXFLAGS) -o $@ -c $<
 
-$(OUTPUT): $(OBJECTS) DB
+$(BUILD_DIR)$(OUTPUT): $(OBJECTS) DB
 	$(info Linking: $@)
 	@$(CXX) -o $@ $(OBJECTS)  $(CXXFLAGS) $(CXXLIBS)
 
 clean:
 	$(MAKE) -C DB/ clean
 	$(MAKE) -C Doc/ clean
-	@rm -rf $(OBJECTS) $(OUTPUT) .depend
+	@rm -rf $(OBJECTS) $(OUTPUT) $(DEPEND_FILES) $(BUILD_DIR)
 
 
 

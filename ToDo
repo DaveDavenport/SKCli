@@ -1,1 +1,3 @@
 * Pick LICENSE. (gpl-v2 or ...)
+* Fix building in build dir off DB.
+* Fix building of lib (dependencies)
