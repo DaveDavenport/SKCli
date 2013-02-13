@@ -5,9 +5,11 @@ CXXFLAGS+=-std=c++11 -Wall
 SOURCES=$(wildcard *.cc)
 OUTPUT=stkcli
 
-OBJECTS=$(SOURCES:%.cc=$(BUILD_DIR)%.o)
 
 BUILD_DIR=build/
+BUILD_DIR_OBJECTS=$(BUILD_DIR)objects/
+
+OBJECTS=$(SOURCES:%.cc=$(BUILD_DIR_OBJECTS)%.o)
 
 all: $(BUILD_DIR)$(OUTPUT)
 
@@ -17,7 +19,7 @@ all: $(BUILD_DIR)$(OUTPUT)
 ##
 CXXFLAGS+=-IHeaders/
 
-CXXLIBS+=-LDB/ -lstk-db
+CXXLIBS+=-L$(BUILD_DIR) -lstk-db
 
 
 ##
@@ -25,23 +27,24 @@ CXXLIBS+=-LDB/ -lstk-db
 ##
 .PHONY: DB
 DB:
-	$(MAKE) -C DB/
+	$(MAKE) -C DB/ BUILD_DIR="../$(BUILD_DIR)"
 
 .PHONY: doc
 doc:
-	$(MAKE) -C Doc/
+	$(MAKE) -C Doc/ BUILD_DIR="../$(BUILD_DIR)"
 
 
 build:
 	$(info Create build directory)
 	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR_OBJECTS)
 
 ##
 # Header tracking.
 ##
 DEPEND_FILES=$(OBJECTS:%.o=%.d)
 
-$(BUILD_DIR)%.d: %.cc  build
+$(BUILD_DIR_OBJECTS)%.d: %.cc  build
 	$(info Finding dependencies: $<)
 	@$(CXX) $(CXXFLAGS) -MM -MF $@ -MT $(@:%.d=%.o)  $<
 
@@ -50,7 +53,7 @@ $(BUILD_DIR)%.d: %.cc  build
 ##
 # Compiling
 ##
-$(BUILD_DIR)%.o: %.cc
+$(BUILD_DIR_OBJECTS)%.o: %.cc
 	$(info Compiling: $< -> $@)	
 	@ $(CXX) $(CXXFLAGS) -o $@ -c $<
 
@@ -59,9 +62,7 @@ $(BUILD_DIR)$(OUTPUT): $(OBJECTS) DB
 	@$(CXX) -o $@ $(OBJECTS)  $(CXXFLAGS) $(CXXLIBS)
 
 clean:
-	$(MAKE) -C DB/ clean
-	$(MAKE) -C Doc/ clean
+	$(MAKE) -C DB/ clean BUILD_DIR="../$(BUILD_DIR)"
+	$(MAKE) -C Doc/ clean BUILD_DIR="../$(BUILD_DIR)"
 	@rm -rf $(OBJECTS) $(OUTPUT) $(DEPEND_FILES) $(BUILD_DIR)
-
-
 
