@@ -32,7 +32,7 @@ depend: .depend
 .depend: $(SOURCES)
 	$(info Calculating dependencies for: $^)
 	@rm -f $@
-	@$(CXX) -MM $^ > $@ 
+	@$(CXX) $(CXXFLAGS) -MM $^ > $@ 
 
 -include .depend
 
