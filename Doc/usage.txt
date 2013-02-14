@@ -10,6 +10,11 @@ Lately I find the console to be more useful then GUIs.
 Therefor I decided to write a CLI version of the tool.
 It will be based on Task Warrior.
 
+Stuffkeeper will be based on it GUI counterpart. So if you are familiar with 
+stuffkeeper, this should sound familiar:
+
+Eco-system
+~~~~~~~~~~
 The SK world exists of the following elements:
 
 * *Type*: Specification of an item.
@@ -18,19 +23,39 @@ The SK world exists of the following elements:
 
 So, an Item is an instance of a Type and can be associated with one or more Tags.
 
+
 Type
-----
+~~~~
 
 A type described what fields are allows in the type. 
 While technically there is no reason to limit the fields of an Item to a fixed set, it is 
 in place to enforce order.
 
 How to create a type using the CLI is not yet clear. The idea is that you need to 
-specify a set of fields, order of the fields and the type (number, text, date, boolean, etc.).
+specify a set of fields, order of the fields and the type of the field.
+
+The following types will be supported (under developement):
+
+* numeric:      A (integer) number. e.g. number of items, price,etc.
+
+NOTE: It is not sure if we should support floats? price might be nicer in floats.
+
+* percentage:   Value between 0 and 100.  Should be displayed as a (colored bar).
+* text:         A single/multi line text entry box.
+* date:         A date. On entry it should accept syntax as 'today'.
+* boolean:      ''True'' or ''False''. 
+* URI:          A clickable file link. (text field that forces schema://path semantic)
+
+The following ones need some thought on implementation:
+
+* list:         A set of text entries. E.g. Track list of a CD.
+* image:        Do a libcaca rendering? or allow user to view using xdg-open?
+* markup:       A field that renders it content based on markup. e.g. using other fields.
+For example for a CD the title could constructed like: '%year: %artist - %album'
 
 
 Item
-----
+~~~~
 
 An item is based on a 'type', the 'type' specifies witch fields it has.
 A item can have 'tags' attached.
@@ -50,7 +75,7 @@ The rest of the fields are defined by 'type'.
 
 
 Tag
----
+~~~
 
 Items can be searched,filtered based on tags.
 
@@ -85,3 +110,13 @@ The '<key>' should be part of the type.
 ----------------
 skcli set-property <uid> <key>:<value>
 ----------------
+
+
+Other
+-----
+We need to put this in the right sections.
+
+* Program should us isatty to decide to output colors.
+* HTML output should be part of the tool.
+* dependencies should be kept low. 
+* Written in C++ c11 standard.
