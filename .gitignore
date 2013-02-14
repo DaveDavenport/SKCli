@@ -4,3 +4,4 @@ stkcli
 .*.swp
 .depend
 Doc/*.html
+build
