@@ -1,6 +1,9 @@
+PREFIX?=$(HOME)/.local/
+CXXFLAGS+=-std=c++11 -Wall
+
+
 MAKEFLAGS=--no-print-directory
 
-CXXFLAGS+=-std=c++11 -Wall
 
 
 SOURCE_DIR=Source
@@ -79,3 +82,9 @@ clean:
 	@$(MAKE) -C Doc/ clean BUILD_DIR="../$(BUILD_DIR)"
 	@rm -rf $(OBJECTS) $(OUTPUT) $(DEPEND_FILES) $(BUILD_DIR)
 
+##
+# Installing
+##
+install: $(OUTPUT)
+	$(info Installing $(notdir $(OUTPUT)) to $(PREFIX))
+	@install $(OUTPUT) $(PREFIX)/bin/
