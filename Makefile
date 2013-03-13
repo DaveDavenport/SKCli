@@ -2,9 +2,9 @@ MAKEFLAGS=--no-print-directory
 
 CXXFLAGS+=-std=c++11 -Wall
 
-SOURCES=$(wildcard *.cc)
 
-
+SOURCE_DIR=Source
+SOURCES=$(wildcard $(SOURCE_DIR)/*.cc)
 BUILD_DIR=build/
 BUILD_DIR_OBJECTS=$(BUILD_DIR)objects/
 
@@ -13,7 +13,7 @@ OUTPUT=$(BUILD_DIR)stkcli
 
 all: $(OUTPUT)
 
-NODEPS:=clean
+NODEPS:=clean doc
 
 
 ##
@@ -38,17 +38,20 @@ doc:
 	@$(MAKE) -C Doc/ BUILD_DIR="../$(BUILD_DIR)"
 
 
-build:
+$(BUILD_DIR):
 	$(info Create build directory)
 	@mkdir -p $(BUILD_DIR)
-	@mkdir -p $(BUILD_DIR_OBJECTS)
+
+$(BUILD_DIR_OBJECTS):
+	$(info Create build object directory)
+	@mkdir -p $(BUILD_DIR_OBJECTS)/$(SOURCE_DIR)
 
 ##
 # Header tracking.
 ##
 DEPEND_FILES=$(OBJECTS:%.o=%.d)
 
-$(BUILD_DIR_OBJECTS)%.d: %.cc  build
+$(BUILD_DIR_OBJECTS)%.d: %.cc $(BUILD_DIR) $(BUILD_DIR_OBJECTS) 
 	$(info Finding dependencies: $<)
 	@$(CXX) $(CXXFLAGS) -MM -MF $@ -MT $(@:%.d=%.o)  $<
 
