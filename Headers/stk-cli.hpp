@@ -23,6 +23,12 @@ namespace Stuffkeeper
                 database( db ) {
             }
 
+            ~CLI ( ) {
+                delete modules[2];
+                delete modules[1];
+                delete modules[0];
+            }
+
             int run ( int argc, char **argv );
 
             Database *get_database() {

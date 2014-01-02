@@ -49,7 +49,7 @@ int Tags::list ( )
     auto tags = this->cli->get_database()->get_tags();
 
     // Get the length of the date
-    int date_length = strlen( "Modification time" );
+    unsigned int date_length = strlen( "Modification time" );
     {
         char buffer[64];
         time_t t=0;
@@ -69,20 +69,23 @@ int Tags::list ( )
 
     // Print header
     printf( "%s%-*s%s %s%-*s%s %s%-*s%s\n",
-            color_underline,
+            color_underline_bold,
             name_length, "Name",
             color_reset,
-            color_underline,
+            color_underline_bold,
             date_length, "Creation time",
             color_reset,
-            color_underline,
+            color_underline_bold,
             date_length, "Modification time",
             color_reset
           );
+    int alternate = 0;
 
     for ( auto tag : tags ) {
         char buffer[64];
         time_t t;
+
+        if ( ( alternate%2 ) == 1 ) printf( color_grey_bg );
 
         printf( "%-*s ", name_length, tag.get_name().c_str() );
         t = tag.get_ctime();
@@ -90,7 +93,12 @@ int Tags::list ( )
         printf( "%-*s ", date_length,buffer );
         t = tag.get_mtime();
         strftime( buffer, 64, "%x", localtime( &t ) );
-        printf( "%-*s\n", date_length, buffer );
+        printf( "%-*s", date_length, buffer );
+
+        if ( ( alternate%2 ) == 1 ) printf( color_reset );
+
+        putchar( '\n' );
+        alternate++;
     }
 
     return 0;

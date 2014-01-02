@@ -25,6 +25,9 @@ namespace Stuffkeeper
             }
 
         public:
+            virtual ~Module() {
+
+            }
             /**
              * Get module name.
              */

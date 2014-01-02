@@ -1,7 +1,7 @@
 EMPTY=
-CLANGXX=$(shell which clang++)
 
 # Check for clang.
+CLANGXX=$(shell which clang++)
 ifneq ($(CLANGXX),$(EMPTY))
 CXX=$(CLANGXX)
 endif
@@ -17,7 +17,7 @@ $(error sqlite3 not found)
 endif
 
 PREFIX?=$(HOME)/.local/
-CXXFLAGS+=-std=c++11 -Wall
+CXXFLAGS+=-std=c++11 -Wall -Wall -Wextra -g3 -Wno-unused-parameter
 
 
 MAKEFLAGS=--no-print-directory
@@ -51,7 +51,7 @@ CXXLIBS+=-L$(BUILD_DIR) -lstk-db $(shell $(PKG_CONFIG) --libs sqlite3)
 .PHONY: $(BUILD_DIR)/libstk-db.a
 DB: $(BUILD_DIR)/libstk-db.a
 	$(info Checking: libstk-db.a)
-	@$(MAKE) -C DB/ BUILD_DIR="../$(BUILD_DIR)" CXX=$(CXX)
+	@$(MAKE) -C DB/ BUILD_DIR="../$(BUILD_DIR)" CXX=$(CXX) CXXFLAG="$(CXXFLAGS)"
 
 .PHONY: doc
 doc:
@@ -99,6 +99,7 @@ clean:
 	@$(MAKE) -C DB/ clean BUILD_DIR="../$(BUILD_DIR)" CXX=$(CXX)
 	@$(MAKE) -C Doc/ clean BUILD_DIR="../$(BUILD_DIR)" CXX=$(CXX)
 	@rm -rf $(OBJECTS) $(OUTPUT) $(DEPEND_FILES) $(BUILD_DIR)
+	@find . -iname *.orig -delete
 
 ##
 # Installing
