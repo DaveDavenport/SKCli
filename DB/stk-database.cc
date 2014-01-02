@@ -28,3 +28,9 @@ list<Type*> Database::get_types()
 
     return types;
 }
+
+list<Tag> Database::get_tags()
+{
+    list<Tag> tags;
+    return tags;
+}

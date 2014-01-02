@@ -34,7 +34,7 @@ namespace Stuffkeeper
 		 * 
 		 * @returns a std::list with Tag objects.
 		 */
-		std::list<Tag&> &get_tags();
+		std::list<Tag> get_tags();
 	};
 }
 

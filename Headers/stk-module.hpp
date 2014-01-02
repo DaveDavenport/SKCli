@@ -11,13 +11,13 @@ namespace Stuffkeeper
 {
 	// Forward declr.
 	class CLI;
-	
+
 	class Module
 	{
 		protected:
 			CLI         *cli;
 			std::string	 name;
-		
+
 			Module(CLI *cli, std::string name):
 				cli(cli),
 				name(name)
@@ -34,10 +34,13 @@ namespace Stuffkeeper
 			/**
 			 * Run function.
 			 */
-			virtual int run ( int argc, char **argv ) { 
+			virtual int run ( int argc, char **argv ) {
 				std::cout << "Module: run not implemented" << std::endl;
-				return 0; 
+				return 0;
 			}
+            virtual int cmd_complete ( int argc, char **argv ) {
+				return 0;
+            }
 	};
 }
 

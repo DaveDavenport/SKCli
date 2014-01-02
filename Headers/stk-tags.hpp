@@ -16,7 +16,13 @@ namespace Stuffkeeper
 
 			}
 
-		virtual int run ( int argc, char **argv );
+            int run ( int argc, char **argv );
+        private:
+            int cmd_complete( int argc, char **argv );
+            /**
+             * Display a list of tags.
+             */
+            void list ();
 	};
 }
 
