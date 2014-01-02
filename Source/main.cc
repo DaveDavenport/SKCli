@@ -12,7 +12,7 @@ int main ( int argc, char **argv )
 {
     Stuffkeeper::Database db;
 
-    Stuffkeeper::CLI stk(&db);
+    Stuffkeeper::CLI stk( &db );
 
-    return stk.run(argc, argv);
+    return stk.run( argc, argv );
 }

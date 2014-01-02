@@ -6,27 +6,28 @@
 
 namespace Stuffkeeper
 {
-    class CLI 
+    class CLI
     {
         private:
             Database *database;
-			const int num_modules = 3;
-			// Modules
-			Module *modules[3] = {
-				new List(this),
-				new Add(this),
-                new Tags(this)
-			};
+            const int num_modules = 3;
+            // Modules
+            Module *modules[3] = {
+                new List( this ),
+                new Add( this ),
+                new Tags( this )
+            };
 
         public:
-            CLI(Database *db):
-                database(db)
-            {
+            CLI( Database *db ):
+                database( db ) {
             }
-    
-            int run ( int argc, char **argv);
 
-            Database *get_database() { return database;}
+            int run ( int argc, char **argv );
+
+            Database *get_database() {
+                return database;
+            }
     };
 }
 

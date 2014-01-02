@@ -7,21 +7,20 @@
 
 namespace Stuffkeeper
 {
-	// Forward declr.
-	class CLI;
-	
+// Forward declr.
+    class CLI;
 
-	class List : public Module
-	{
-		public:
-		List(CLI *cli):
-			Module(cli, "list")
-		{
 
-		}
+    class List : public Module
+    {
+        public:
+            List( CLI *cli ):
+                Module( cli, "list" ) {
 
-		int run (int argc, char **argv);
+            }
 
-	};
+            int run ( int argc, char **argv );
+
+    };
 }
 #endif

@@ -9,39 +9,40 @@
 
 namespace Stuffkeeper
 {
-	// Forward declr.
-	class CLI;
+// Forward declr.
+    class CLI;
 
-	class Module
-	{
-		protected:
-			CLI         *cli;
-			std::string	 name;
+    class Module
+    {
+        protected:
+            CLI         *cli;
+            std::string  name;
 
-			Module(CLI *cli, std::string name):
-				cli(cli),
-				name(name)
-			{
+            Module( CLI *cli, std::string name ):
+                cli( cli ),
+                name( name ) {
 
-			}
-
-		public:
-			/**
-			 * Get module name.
-			 */
-			std::string &get_name() { return name; }
-
-			/**
-			 * Run function.
-			 */
-			virtual int run ( int argc, char **argv ) {
-				std::cout << "Module: run not implemented" << std::endl;
-				return 0;
-			}
-            virtual int cmd_complete ( int argc, char **argv ) {
-				return 0;
             }
-	};
+
+        public:
+            /**
+             * Get module name.
+             */
+            std::string &get_name() {
+                return name;
+            }
+
+            /**
+             * Run function.
+             */
+            virtual int run ( int argc, char **argv ) {
+                std::cout << "Module: run not implemented" << std::endl;
+                return 0;
+            }
+            virtual int cmd_complete ( int argc, char **argv ) {
+                return 0;
+            }
+    };
 }
 
 #endif

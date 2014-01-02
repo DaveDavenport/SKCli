@@ -5,16 +5,15 @@
 
 namespace Stuffkeeper
 {
-	class CLI;
+    class CLI;
 
-	class Tags: public Module
-	{
-		public:
-			Tags(CLI *cli):
-				Module(cli, "tags")
-			{
+    class Tags: public Module
+    {
+        public:
+            Tags( CLI *cli ):
+                Module( cli, "tags" ) {
 
-			}
+            }
 
             int run ( int argc, char **argv );
         private:
@@ -32,7 +31,7 @@ namespace Stuffkeeper
              * Display a list of tags.
              */
             void list ();
-	};
+    };
 }
 
 #endif

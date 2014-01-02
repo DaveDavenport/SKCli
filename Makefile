@@ -106,3 +106,10 @@ clean:
 install: $(OUTPUT)
 	$(info Installing $(notdir $(OUTPUT)) to $(PREFIX))
 	@install $(OUTPUT) $(PREFIX)/bin/
+
+
+##
+# Indenting
+##
+indent:
+	@astyle -R --style=linux -C -D -N -H -W3 -f *.cc *.hpp

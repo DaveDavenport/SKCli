@@ -5,19 +5,18 @@
 
 namespace Stuffkeeper
 {
-	class CLI;
+    class CLI;
 
-	class Add : public Module
-	{
-		public:
-			Add(CLI *cli):
-				Module(cli, "add")
-			{
+    class Add : public Module
+    {
+        public:
+            Add( CLI *cli ):
+                Module( cli, "add" ) {
 
-			}
+            }
 
-		virtual int run ( int argc, char **argv );
-	};
+            virtual int run ( int argc, char **argv );
+    };
 }
 
 #endif

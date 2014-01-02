@@ -14,38 +14,38 @@
 
 namespace Stuffkeeper
 {
-	class Database
-	{
+    class Database
+    {
         private:
             /** Handle to the sqlite database */
             sqlite3 *db_handle = nullptr;
 
-		public:
-        /**
-         * Constructor.
-         */
-        Database();
-        /**
-         * Deconstructor.
-         */
-         ~Database();
+        public:
+            /**
+             * Constructor.
+             */
+            Database();
+            /**
+             * Deconstructor.
+             */
+            ~Database();
 
-		/**
-		 * Get a list of the available types in the 
-		 * database.
-		 * 
-		 * @returns a std::list with Type objects.
-		 */
-		std::list<Type*> get_types();
+            /**
+             * Get a list of the available types in the
+             * database.
+             *
+             * @returns a std::list with Type objects.
+             */
+            std::list<Type*> get_types();
 
-		/**
-		 * Get a list of the available tags in the 
-		 * database.
-		 * 
-		 * @returns a std::list with Tag objects.
-		 */
-		std::list<Tag> get_tags();
-	};
+            /**
+             * Get a list of the available tags in the
+             * database.
+             *
+             * @returns a std::list with Tag objects.
+             */
+            std::list<Tag> get_tags();
+    };
 }
 
 #endif
