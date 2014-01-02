@@ -22,7 +22,7 @@ int Tags::cmd_complete( int argc, char **argv )
 
     string command = argv[0];
 
-    if ( command == "show" ) {
+    if ( command == "show"  && argc == 1) {
         // Print out tags.
         std::list<Tag> tags = this->cli->get_database()->get_tags();
 

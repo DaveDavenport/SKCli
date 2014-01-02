@@ -1,0 +1,8 @@
+_stkcli()
+{
+	COMPREPLY=()
+	curw=${COMP_WORDS[COMP_CWORD]}
+    emp=$(($COMP_CWORD-1))
+	COMPREPLY=($(compgen -W '$(stkcli --complete ${COMP_WORDS[@]:1:$emp} )' -- $curw))
+}
+complete -F _stkcli stkcli
