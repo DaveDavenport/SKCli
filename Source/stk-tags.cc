@@ -108,7 +108,7 @@ int Tags::run ( int argc, char **argv )
         } else if ( command == "list" ) {
             return this->list();
         } else if ( command == "add" ) {
-
+            return this->add(argc-1, &argv[1]);
         } else if ( command == "remove" ) {
 
         } else if ( command == "show" ) {
@@ -119,5 +119,37 @@ int Tags::run ( int argc, char **argv )
 
     }
 
+    return 0;
+}
+
+
+int Tags::add( int argc, char **argv )
+{
+    printf( "%s[%s::%s]%s\n",
+            color_blue,
+            this->get_name().c_str(),
+            "add",
+            color_reset );
+    putchar( '\n' );
+    if ( argc == 0 ){
+        fprintf(stderr, "%s%s%s\n",
+            color_red_bold,
+            "The new tag requires a name",
+            color_reset);
+        return 1;
+    }
+    string name = argv[0];    
+
+    Tag *t = this->cli->get_database()->tag_add(name);
+    if ( t == nullptr  ) {
+        fprintf(stderr, "%s%s%s: %s\n",
+            color_red_bold,
+            "Failed to add tag",
+            color_reset,
+            name.c_str());
+        return 1;
+    }
+    t->print();
+    delete t;
     return 0;
 }

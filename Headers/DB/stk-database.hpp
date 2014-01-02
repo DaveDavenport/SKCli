@@ -21,6 +21,7 @@ namespace Stuffkeeper
             sqlite3 *db_handle = nullptr;
             /** Precompiled stmts */
             sqlite3_stmt *stmt_tag_list = nullptr;
+            sqlite3_stmt *stmt_tag_add = nullptr;
 
             // check, and if not exists create tables.
             void validate_tables();
@@ -45,12 +46,26 @@ namespace Stuffkeeper
             std::list<Type*> get_types();
 
             /**
+             * Tags
+             */
+            /**
              * Get a list of the available tags in the
              * database.
              *
              * @returns a std::list with Tag objects.
              */
             std::list<Tag> get_tags();
+
+            /**
+             * @param name Name of the new tag
+             *
+             * Add tag.
+             *
+             * @returns the new Tag.
+             */
+            Tag *tag_add( const std::string name );
+
+            Tag *tag_get ( const std::string name );
     };
 }
 

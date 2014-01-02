@@ -40,6 +40,11 @@ Database::~Database()
         stmt_tag_list = nullptr;
     }
 
+    if ( stmt_tag_add != nullptr ) {
+        sqlite3_finalize( stmt_tag_add );
+        stmt_tag_add = nullptr;
+    }
+
     if ( db_handle != nullptr ) {
         sqlite3_close( db_handle );
         db_handle = nullptr;
@@ -57,6 +62,14 @@ void Database::prepare_stmts()
         fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_list_str,retv );
     }
 
+    const char * const stmt_tag_add_str = "INSERT INTO tags VALUES(null, ?, ?, ?)";
+    retv = sqlite3_prepare_v2( this->db_handle,
+                               stmt_tag_add_str, -1,
+                               &( this->stmt_tag_add ),nullptr );
+
+    if ( retv != SQLITE_OK ) {
+        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_add_str,retv );
+    }
 }
 
 void Database::validate_tables()
@@ -66,12 +79,13 @@ void Database::validate_tables()
                        "uid INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,"
                        "ctime INTEGER,"
                        "mtime INTEGER,"
-                       "name  INTEGER);";
+                       "name  INTEGER UNIQUE);";
     int retv = sqlite3_exec( this->db_handle, stmt, nullptr, nullptr, &errmsg );
 
     if ( retv!= SQLITE_OK ) {
         fprintf( stderr, "Failed to create table: %s\n", errmsg );
     }
+
 
 }
 
@@ -123,4 +137,30 @@ list<Tag> Database::get_tags()
     // Reset the query.
     sqlite3_reset( this->stmt_tag_list );
     return tags;
+}
+
+Tag *Database::tag_add( const string name )
+{
+    time_t now = time( nullptr );
+
+    sqlite3_bind_int64( this->stmt_tag_add, 1, now );
+    sqlite3_bind_int64( this->stmt_tag_add, 2, now );
+    sqlite3_bind_text( this->stmt_tag_add, 3, name.c_str(), strlen( name.c_str() ), SQLITE_TRANSIENT );
+
+    int rc = sqlite3_step( this->stmt_tag_add);
+
+    if ( rc == SQLITE_CONSTRAINT ) {
+        return nullptr;
+    }
+    if ( rc != SQLITE_DONE ) {
+        fprintf( stderr, "Error %d: %s\n",rc,
+                 sqlite3_errmsg( this->db_handle ) );
+        return nullptr;
+    }
+
+    uint32_t id = sqlite3_last_insert_rowid( this->db_handle );
+
+    sqlite3_reset(stmt_tag_add);
+
+    return new Tag(id, now, now, name);
 }
