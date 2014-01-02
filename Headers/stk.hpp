@@ -9,6 +9,7 @@
 // Modules
 #include "stk-add.hpp"
 #include "stk-list.hpp"
+#include "stk-tags.hpp"
 
 
 

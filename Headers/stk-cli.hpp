@@ -10,11 +10,12 @@ namespace Stuffkeeper
     {
         private:
             Database *database;
-			const int num_modules = 2;
+			const int num_modules = 3;
 			// Modules
-			Module *modules[2] = {
+			Module *modules[3] = {
 				new List(this),
-				new Add(this)
+				new Add(this),
+                new Tags(this)
 			};
 
         public:
