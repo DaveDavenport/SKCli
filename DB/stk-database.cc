@@ -147,11 +147,12 @@ Tag *Database::tag_add( const string name )
     sqlite3_bind_int64( this->stmt_tag_add, 2, now );
     sqlite3_bind_text( this->stmt_tag_add, 3, name.c_str(), strlen( name.c_str() ), SQLITE_TRANSIENT );
 
-    int rc = sqlite3_step( this->stmt_tag_add);
+    int rc = sqlite3_step( this->stmt_tag_add );
 
     if ( rc == SQLITE_CONSTRAINT ) {
         return nullptr;
     }
+
     if ( rc != SQLITE_DONE ) {
         fprintf( stderr, "Error %d: %s\n",rc,
                  sqlite3_errmsg( this->db_handle ) );
@@ -160,7 +161,13 @@ Tag *Database::tag_add( const string name )
 
     uint32_t id = sqlite3_last_insert_rowid( this->db_handle );
 
-    sqlite3_reset(stmt_tag_add);
+    sqlite3_reset( stmt_tag_add );
 
-    return new Tag(id, now, now, name);
+    return new Tag( id, now, now, name );
+}
+
+Tag *Database::tag_get ( const string name )
+{
+    // TODO: get tag from db.
+    return nullptr;
 }

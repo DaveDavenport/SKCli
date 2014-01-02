@@ -33,12 +33,12 @@ namespace Stuffkeeper
              * @returns 0 if success.
              */
             int list ();
-    
+
             /**
              * @param argc number of arguments.
              * @param argv list of arguments passed to <cmd> --complete tags
              *
-             * add 
+             * add
              *
              * @returns 0 if success.
              */

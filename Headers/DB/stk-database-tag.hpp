@@ -39,12 +39,12 @@ namespace Stuffkeeper
             }
             void print() {
                 char buffer[64];
-                printf("Uid:   %d\n", uid);
+                printf( "Uid:   %d\n", uid );
                 strftime( buffer, 64, "%x %X", localtime( &ctime ) );
-                printf("ctime: %s\n", buffer); 
+                printf( "ctime: %s\n", buffer );
                 strftime( buffer, 64, "%x %X", localtime( &mtime ) );
-                printf("mtime: %s\n", buffer);
-                printf("Name:  %s\n", name.c_str()); 
+                printf( "mtime: %s\n", buffer );
+                printf( "Name:  %s\n", name.c_str() );
             }
 
     };
