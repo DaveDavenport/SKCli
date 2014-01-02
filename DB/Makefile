@@ -1,4 +1,17 @@
-CXXFLAGS+=-std=c++11 -Wall
+EMPTY=
+PKG_CONFIG=$(shell which pkg-config)
+ifeq ($(PKG_CONFIG),$(EMPTY))
+$(error pkg-config not found.)
+endif
+
+PKG_CONFIG_VERSION=$(shell $(PKG_CONFIG) --silence-errors --modversion sqlite3)
+
+ifeq ($(PKG_CONFIG_VERSION),$(EMPTY))
+$(error sqlite3 not found) 
+endif
+
+
+CXXFLAGS+=-std=c++11 -Wall $(shell $(PKG_CONFIG) --cflags sqlite3)
 
 SOURCES=$(wildcard *.cc)
 
@@ -42,7 +55,6 @@ $(BUILD_DIR_OBJECTS)$(LIB_PREFIX)%.o: %.cc
 $(OUTPUT): $(OBJECTS)
 	$(info Linking: $@)
 	@$(AR) rcs $@ $^ 
-
 clean:
 	@rm -rf $(OBJECTS) $(OUTPUT) .depend
 

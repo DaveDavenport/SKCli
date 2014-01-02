@@ -5,6 +5,9 @@
 #include <list>
 #include <stdint.h>
 
+// Sqlite
+#include <sqlite3.h>
+
 #include <DB/stk-database-type.hpp>
 #include <DB/stk-database-tag.hpp>
 #include <DB/stk-database-item.hpp>
@@ -13,12 +16,19 @@ namespace Stuffkeeper
 {
 	class Database
 	{
+        private:
+            /** Handle to the sqlite database */
+            sqlite3 *db_handle = nullptr;
 
 		public:
         /**
          * Constructor.
          */
         Database();
+        /**
+         * Deconstructor.
+         */
+         ~Database();
 
 		/**
 		 * Get a list of the available types in the 

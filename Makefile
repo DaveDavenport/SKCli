@@ -1,3 +1,21 @@
+EMPTY=
+CLANGXX=$(shell which clang++)
+
+# Check for clang.
+ifneq ($(CLANGXX),$(EMPTY))
+CXX=$(CLANGXX)
+endif
+PKG_CONFIG=$(shell which pkg-config)
+ifeq ($(PKG_CONFIG),$(EMPTY))
+$(error pkg-config not found.)
+endif
+
+PKG_CONFIG_VERSION=$(shell $(PKG_CONFIG) --silence-errors --modversion sqlite3)
+
+ifeq ($(PKG_CONFIG_VERSION),$(EMPTY))
+$(error sqlite3 not found) 
+endif
+
 PREFIX?=$(HOME)/.local/
 CXXFLAGS+=-std=c++11 -Wall
 
@@ -24,7 +42,7 @@ NODEPS:=clean doc
 ##
 CXXFLAGS+=-IHeaders/
 
-CXXLIBS+=-L$(BUILD_DIR) -lstk-db
+CXXLIBS+=-L$(BUILD_DIR) -lstk-db $(shell $(PKG_CONFIG) --libs sqlite3)
 
 
 ##
@@ -33,7 +51,7 @@ CXXLIBS+=-L$(BUILD_DIR) -lstk-db
 .PHONY: $(BUILD_DIR)/libstk-db.a
 DB: $(BUILD_DIR)/libstk-db.a
 	$(info Checking: libstk-db.a)
-	@$(MAKE) -C DB/ BUILD_DIR="../$(BUILD_DIR)"
+	@$(MAKE) -C DB/ BUILD_DIR="../$(BUILD_DIR)" CXX=$(CXX)
 
 .PHONY: doc
 doc:
@@ -78,8 +96,8 @@ $(OUTPUT): $(OBJECTS) DB
 
 clean:
 	$(info Cleaning...)
-	@$(MAKE) -C DB/ clean BUILD_DIR="../$(BUILD_DIR)"
-	@$(MAKE) -C Doc/ clean BUILD_DIR="../$(BUILD_DIR)"
+	@$(MAKE) -C DB/ clean BUILD_DIR="../$(BUILD_DIR)" CXX=$(CXX)
+	@$(MAKE) -C Doc/ clean BUILD_DIR="../$(BUILD_DIR)" CXX=$(CXX)
 	@rm -rf $(OBJECTS) $(OUTPUT) $(DEPEND_FILES) $(BUILD_DIR)
 
 ##

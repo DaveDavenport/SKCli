@@ -18,7 +18,16 @@ namespace Stuffkeeper
 
             int run ( int argc, char **argv );
         private:
+            /**
+             * @param argc number of arguments.
+             * @param argv list of arguments passed to <cmd> --complete tags
+             *
+             * Auto complete handler.
+             *
+             * @returns 0 if success.
+             */
             int cmd_complete( int argc, char **argv );
+
             /**
              * Display a list of tags.
              */
