@@ -114,3 +114,8 @@ install: $(OUTPUT)
 ##
 indent:
 	@astyle -R --style=linux -S -C -D -N -H -L -W3 -f *.cc *.hpp
+
+
+view:
+	@$(MAKE) -C Doc/ view BUILD_DIR="../$(BUILD_DIR)" CXX=$(CXX)
+
