@@ -15,6 +15,9 @@ namespace stuffkeeper
             // 0 means invalid.
             uint32_t    uid = 0;
         public:
+            uint32_t get_uid() {
+                return uid;
+            }
 
     };
 }

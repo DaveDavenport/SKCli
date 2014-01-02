@@ -29,8 +29,10 @@ namespace Stuffkeeper
 
             /**
              * Display a list of tags.
+             *
+             * @returns 0 if success.
              */
-            void list ();
+            int list ();
     };
 }
 

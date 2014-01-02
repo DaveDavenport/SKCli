@@ -84,6 +84,16 @@ An example of a tag could be: Jazz, MusicBox1, Gadget, etc.
 Tags can be renamed and removed (if no longer linked to an item).
 
 
+[width="50%",cols="1,2", options="header"]
+|=====================================
+| Field              | Description
+| UID                | A unique id to identify the tag 
+| ctime              | Timestamp when tag was created.
+| mdate              | Timestamp the tag was last edited.
+| name               | Name of the tag 
+|=====================================
+
+
 Proposed API
 ------------
 

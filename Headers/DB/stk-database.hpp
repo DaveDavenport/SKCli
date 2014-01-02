@@ -19,7 +19,13 @@ namespace Stuffkeeper
         private:
             /** Handle to the sqlite database */
             sqlite3 *db_handle = nullptr;
+            /** Precompiled stmts */
+            sqlite3_stmt *stmt_tag_list = nullptr;
 
+            // check, and if not exists create tables.
+            void validate_tables();
+            // Prepare precompiled sqlite stmt.
+            void prepare_stmts();
         public:
             /**
              * Constructor.

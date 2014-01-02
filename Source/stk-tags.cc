@@ -1,6 +1,9 @@
 #include <iostream>
 #include <list>
+#include <string.h>
+#include <time.h>
 #include "stk.hpp"
+#include "stk-colors.hpp"
 
 using namespace Stuffkeeper;
 using namespace std;
@@ -33,14 +36,64 @@ int Tags::cmd_complete( int argc, char **argv )
 }
 
 
-void Tags::list ( )
+int Tags::list ( )
 {
-    // List all tags.
-    cout << "Current tags:" << endl;
+    printf( "%s[%s::%s]%s\n",
+            color_blue,
+            this->get_name().c_str(),
+            "list",
+            color_reset );
+    putchar( '\n' );
 
-    for ( auto tag : this->cli->get_database()->get_tags() ) {
-        cout << tag.get_name() << endl;
+    // List all tags.
+    auto tags = this->cli->get_database()->get_tags();
+
+    // Get the length of the date
+    int date_length = strlen( "Modification time" );
+    {
+        char buffer[64];
+        time_t t=0;
+        strftime( buffer, 64, "%x", localtime( &t ) );
+
+        if ( strlen( buffer ) > date_length ) date_length = strlen( buffer );
     }
+
+    // Get the max length of the tag names.
+    int name_length = 4;
+
+    for ( auto tag : tags ) {
+        int l = tag.get_name().length();
+
+        if ( l > name_length ) name_length = l;
+    }
+
+    // Print header
+    printf( "%s%-*s%s %s%-*s%s %s%-*s%s\n",
+            color_underline,
+            name_length, "Name",
+            color_reset,
+            color_underline,
+            date_length, "Creation time",
+            color_reset,
+            color_underline,
+            date_length, "Modification time",
+            color_reset
+          );
+
+    for ( auto tag : tags ) {
+        char buffer[64];
+        time_t t;
+
+        printf( "%-*s ", name_length, tag.get_name().c_str() );
+        t = tag.get_ctime();
+        strftime( buffer, 64, "%x", localtime( &t ) );
+        printf( "%-*s ", date_length,buffer );
+        t = tag.get_mtime();
+        strftime( buffer, 64, "%x", localtime( &t ) );
+        printf( "%-*s\n", date_length, buffer );
+    }
+
+    return 0;
 }
 
 
@@ -48,18 +101,19 @@ int Tags::run ( int argc, char **argv )
 {
     if ( argc > 0 ) {
         string command = argv[0];
-        cout << "Tags: " << command << endl;
 
         // completed.
         if ( command == "--complete" ) {
             return this->cmd_complete( argc-1, &argv[1] );
         } else if ( command == "list" ) {
-
+            return this->list();
         } else if ( command == "add" ) {
 
         } else if ( command == "remove" ) {
 
         } else if ( command == "show" ) {
+
+        } else if ( command == "rename" ) {
 
         }
 

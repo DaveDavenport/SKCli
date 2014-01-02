@@ -29,16 +29,51 @@ Database::Database()
         exit( -1 );
     }
 
+    this->validate_tables();
+    this->prepare_stmts();
 }
 
 Database::~Database()
 {
+    if ( stmt_tag_list != nullptr ) {
+        sqlite3_finalize( stmt_tag_list );
+        stmt_tag_list = nullptr;
+    }
+
     if ( db_handle != nullptr ) {
         sqlite3_close( db_handle );
         db_handle = nullptr;
     }
 }
 
+void Database::prepare_stmts()
+{
+    const char * const stmt_tag_list_str = "SELECT * FROM tags";
+    int retv = sqlite3_prepare_v2( this->db_handle,
+                                   stmt_tag_list_str, -1,
+                                   &( this->stmt_tag_list ),nullptr );
+
+    if ( retv != SQLITE_OK ) {
+        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_list_str,retv );
+    }
+
+}
+
+void Database::validate_tables()
+{
+    char *errmsg = nullptr;
+    const char *stmt = "CREATE TABLE IF NOT EXISTS tags ("
+                       "uid INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,"
+                       "ctime INTEGER,"
+                       "mtime INTEGER,"
+                       "name  INTEGER);";
+    int retv = sqlite3_exec( this->db_handle, stmt, nullptr, nullptr, &errmsg );
+
+    if ( retv!= SQLITE_OK ) {
+        fprintf( stderr, "Failed to create table: %s\n", errmsg );
+    }
+
+}
 
 
 
@@ -56,5 +91,36 @@ list<Type*> Database::get_types()
 list<Tag> Database::get_tags()
 {
     list<Tag> tags;
+    int rc;
+
+    do {
+        rc = sqlite3_step( this->stmt_tag_list );
+
+        switch ( rc )  {
+            case SQLITE_DONE:
+                break;
+
+            case SQLITE_ROW: {
+                string name = reinterpret_cast<const
+                              char*>( sqlite3_column_text( this->stmt_tag_list, 3 ) );
+                Tag tag(
+                    sqlite3_column_int( this->stmt_tag_list, 0 ),
+                    sqlite3_column_int64( this->stmt_tag_list, 1 ),
+                    sqlite3_column_int64( this->stmt_tag_list, 2 ),
+                    name );
+                tags.push_back( tag );
+            }
+            break;
+
+            default:
+                fprintf( stderr, "Error iterating table: %s\n",
+                         sqlite3_errmsg( this->db_handle ) );
+                break;
+        }
+
+    } while ( rc == SQLITE_ROW );
+
+    // Reset the query.
+    sqlite3_reset( this->stmt_tag_list );
     return tags;
 }

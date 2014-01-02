@@ -18,6 +18,9 @@ namespace Stuffkeeper
             std::string &get_name() {
                 return name;
             }
+            uint32_t get_uid() {
+                return uid;
+            }
             // Constructor
             Type( uint32_t uid ):
                 uid( uid ) {

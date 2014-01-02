@@ -112,4 +112,4 @@ install: $(OUTPUT)
 # Indenting
 ##
 indent:
-	@astyle -R --style=linux -C -D -N -H -W3 -f *.cc *.hpp
+	@astyle -R --style=linux -S -C -D -N -H -L -W3 -f *.cc *.hpp
