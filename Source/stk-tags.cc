@@ -156,12 +156,21 @@ int Tags::add( int argc, char **argv )
         return 1;
     }
 
+    // Get tag name
     string name = argv[0];
-
     for ( int j=1; j < argc; j++ ) {
         name += " "+string( argv[j] );
     }
 
+    // Check tag
+    Tag *test = this->cli->get_database()->tag_get( name );
+    if(test != nullptr) {
+        error_printf("Tag with name: '%s' already exists.", name.c_str());
+        delete test;
+        return -1;
+    }
+
+    // Add tag
     Tag *t = this->cli->get_database()->tag_add( name );
 
     if ( t == nullptr  ) {
