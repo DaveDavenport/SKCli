@@ -117,18 +117,20 @@ list<Type*> Database::get_types()
     return types;
 }
 
-Tag *Database::tag_get(const std::string name)
+Tag *Database::tag_get(const std::string tag_name)
 {
     sqlite3_bind_text( this->stmt_tag_get, 1,
-            name.c_str(), strlen( name.c_str() ), SQLITE_TRANSIENT );
+            tag_name.c_str(), strlen( tag_name.c_str() ), SQLITE_TRANSIENT );
 
     int rc = sqlite3_step( this->stmt_tag_get );
 
     if ( rc == SQLITE_ROW ) {
+        string name = reinterpret_cast<const
+            char*>( sqlite3_column_text( this->stmt_tag_get, 3 ) );
         Tag *t = new Tag(
-                    sqlite3_column_int( this->stmt_tag_list, 0 ),
-                    sqlite3_column_int64( this->stmt_tag_list, 1 ),
-                    sqlite3_column_int64( this->stmt_tag_list, 2 ),
+                    sqlite3_column_int( this->stmt_tag_get, 0 ),
+                    sqlite3_column_int64( this->stmt_tag_get, 1 ),
+                    sqlite3_column_int64( this->stmt_tag_get, 2 ),
                     name );
 
         sqlite3_reset(this->stmt_tag_get);
