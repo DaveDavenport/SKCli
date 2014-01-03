@@ -38,11 +38,7 @@ int Tags::cmd_complete( int argc, char **argv )
 
 int Tags::list ( )
 {
-    printf( "%s[%s::%s]%s\n",
-            color_blue,
-            this->get_name().c_str(),
-            "list",
-            color_reset );
+    this->print_id( "list" );
     putchar( '\n' );
 
     // List all tags.
@@ -67,38 +63,25 @@ int Tags::list ( )
         if ( l > name_length ) name_length = l;
     }
 
-    // Print header
-    printf( "%s%-*s%s %s%-*s%s %s%-*s%s\n",
-            color_underline_bold,
-            name_length, "Name",
-            color_reset,
-            color_underline_bold,
-            date_length, "Creation time",
-            color_reset,
-            color_underline_bold,
-            date_length, "Modification time",
-            color_reset
-          );
-    int alternate = 0;
+
+    table_header_field_print( "%-*s", name_length,"Name" );
+    table_header_field_print( "%-*s", date_length,"Creation Time" );
+    table_header_field_print( "%-*s", date_length,"Modification Time" );
+    table_row_new();
 
     for ( auto tag : tags ) {
         char buffer[64];
         time_t t;
 
-        if ( ( alternate%2 ) == 1 ) printf( color_grey_bg );
-
-        printf( "%-*s ", name_length, tag.get_name().c_str() );
+        table_field_print( "%-*s", name_length, tag.get_name().c_str() );
         t = tag.get_ctime();
         strftime( buffer, 64, "%x", localtime( &t ) );
-        printf( "%-*s ", date_length,buffer );
+        table_field_print( "%-*s", date_length,buffer );
         t = tag.get_mtime();
         strftime( buffer, 64, "%x", localtime( &t ) );
-        printf( "%-*s", date_length, buffer );
+        table_field_print( "%-*s", date_length, buffer );
 
-        if ( ( alternate%2 ) == 1 ) printf( color_reset );
-
-        putchar( '\n' );
-        alternate++;
+        table_row_new();
     }
 
     return 0;
@@ -132,30 +115,30 @@ int Tags::run ( int argc, char **argv )
 
 int Tags::show( int argc, char **argv )
 {
-    printf( "%s[%s::%s]%s\n",
-            color_blue,
-            this->get_name().c_str(),
-            "show",
-            color_reset );
+    this->print_id( "show" );
     putchar( '\n' );
-    if(argc == 0) {
-        error_printf("stkcli tags show <id>");
+
+    if ( argc == 0 ) {
+        error_printf( "stkcli tags show <id>" );
         return 1;
     }
 
-    // TODO: combine arguments.
     string name = argv[0];
-    for(int j=1; j < argc; j++) {
-        name += " "+string(argv[j]);
+
+    for ( int j=1; j < argc; j++ ) {
+        name += " "+string( argv[j] );
     }
+
     // Tag
-    Tag *t = this->cli->get_database()->tag_get(name);
+    Tag *t = this->cli->get_database()->tag_get( name );
+
     if ( t != nullptr ) {
         t->print();
         delete t;
-    }else{
-        error_printf("Tag: '%s' not found", name.c_str());
+    } else {
+        error_printf( "Tag: '%s' not found", name.c_str() );
     }
+
     return 0;
 }
 
@@ -174,8 +157,9 @@ int Tags::add( int argc, char **argv )
     }
 
     string name = argv[0];
-    for(int j=1; j < argc; j++) {
-        name += " "+string(argv[j]);
+
+    for ( int j=1; j < argc; j++ ) {
+        name += " "+string( argv[j] );
     }
 
     Tag *t = this->cli->get_database()->tag_add( name );

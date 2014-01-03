@@ -45,6 +45,8 @@ namespace Stuffkeeper
             virtual int cmd_complete ( int argc, char **argv ) {
                 return 0;
             }
+
+            void print_id( const std::string name );
     };
 }
 
