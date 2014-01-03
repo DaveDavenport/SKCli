@@ -195,6 +195,7 @@ int Tags::rename ( int argc, char **argv )
     }
 
     Tag *t = this->cli->get_database()->tag_rename( tag, new_name );
+
     if ( t == nullptr  ) {
         error_printf( "Failed to rename tag: " );
         fprintf( stderr, "%s->%s\n",tag->get_name().c_str(),new_name.c_str() );
@@ -252,7 +253,7 @@ int Tags::add( int argc, char **argv )
 
 int Tags::remove ( int argc, char **argv )
 {
-    this->print_id("remove");
+    this->print_id( "remove" );
     putchar( '\n' );
 
     if ( argc == 0 ) {
@@ -280,6 +281,7 @@ int Tags::remove ( int argc, char **argv )
     // Double check with user.
     bool valid = false;
     string new_name;
+
     while ( !valid ) {
         printf( "Are you sure? (y/n): " );
         cin >> new_name;
@@ -287,20 +289,22 @@ int Tags::remove ( int argc, char **argv )
         if ( new_name == "n" ) {
             delete tag;
             return 0;
-        } else if (new_name == "y" ) {
+        } else if ( new_name == "y" ) {
             valid = true;
             break;
         }
     }
 
     int retv = this->cli->get_database()->tag_remove( tag );
-    if(!retv) {
-        error_printf("Failed to remove tag\n");
+
+    if ( !retv ) {
+        error_printf( "Failed to remove tag\n" );
         delete tag;
         return 1;
     } else {
-        printf("Tag: '%s' removed.\n", tag->get_name().c_str());
+        printf( "Tag: '%s' removed.\n", tag->get_name().c_str() );
     }
+
     delete tag;
     return 0;
 }

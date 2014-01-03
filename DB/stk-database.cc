@@ -243,6 +243,7 @@ Tag *Database::tag_rename ( const Tag *old, const std::string new_name )
     sqlite3_bind_int( this->stmt_tag_rename, 3, old->get_uid() );
 
     int rc = sqlite3_step( this->stmt_tag_rename );
+
     if ( rc == SQLITE_DONE ) {
         new_tag = this->tag_get( new_name );
     } else {
@@ -260,6 +261,7 @@ bool Database::tag_remove ( const Tag *old )
     sqlite3_bind_int( this->stmt_tag_remove, 1, old->get_uid() );
 
     int rc = sqlite3_step( this->stmt_tag_remove );
+
     if ( rc != SQLITE_DONE ) {
         sqlite3_reset( this->stmt_tag_remove );
         return false;
