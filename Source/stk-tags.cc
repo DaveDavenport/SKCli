@@ -22,7 +22,7 @@ int Tags::cmd_complete( int argc, char **argv )
 
     string command = argv[0];
 
-    if ( command == "show"  && argc == 1) {
+    if ( command == "show"  && argc == 1 ) {
         // Print out tags.
         std::list<Tag> tags = this->cli->get_database()->get_tags();
 
@@ -120,7 +120,7 @@ int Tags::run ( int argc, char **argv )
         } else if ( command == "remove" ) {
 
         } else if ( command == "show" ) {
-
+            return this->show( argc-1, &argv[1] );
         } else if ( command == "rename" ) {
 
         }
@@ -130,6 +130,34 @@ int Tags::run ( int argc, char **argv )
     return 0;
 }
 
+int Tags::show( int argc, char **argv )
+{
+    printf( "%s[%s::%s]%s\n",
+            color_blue,
+            this->get_name().c_str(),
+            "show",
+            color_reset );
+    putchar( '\n' );
+    if(argc == 0) {
+        error_printf("stkcli tags show <id>");
+        return 1;
+    }
+
+    // TODO: combine arguments.
+    string name = argv[0];
+    for(int j=1; j < argc; j++) {
+        name += " "+string(argv[j]);
+    }
+    // Tag
+    Tag *t = this->cli->get_database()->tag_get(name);
+    if ( t != nullptr ) {
+        t->print();
+        delete t;
+    }else{
+        error_printf("Tag: '%s' not found", name.c_str());
+    }
+    return 0;
+}
 
 int Tags::add( int argc, char **argv )
 {
@@ -141,23 +169,20 @@ int Tags::add( int argc, char **argv )
     putchar( '\n' );
 
     if ( argc == 0 ) {
-        fprintf( stderr, "%s%s%s\n",
-                 color_red_bold,
-                 "The new tag requires a name",
-                 color_reset );
+        error_printf( "The new tag requires a name." );
         return 1;
     }
 
     string name = argv[0];
+    for(int j=1; j < argc; j++) {
+        name += " "+string(argv[j]);
+    }
 
     Tag *t = this->cli->get_database()->tag_add( name );
 
     if ( t == nullptr  ) {
-        fprintf( stderr, "%s%s%s: %s\n",
-                 color_red_bold,
-                 "Failed to add tag",
-                 color_reset,
-                 name.c_str() );
+        error_printf( "Failed to add tag: " );
+        fprintf( stderr, "%s\n",name.c_str() );
         return 1;
     }
 

@@ -43,6 +43,8 @@ namespace Stuffkeeper
              * @returns 0 if success.
              */
             int add( int argc, char **argv );
+
+            int show( int argc, char **argv );
     };
 }
 

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "stk-cli.hpp"
+#include "stk-colors.hpp"
 
 using namespace std;
 using namespace Stuffkeeper;
@@ -42,6 +43,8 @@ int Stuffkeeper::CLI::run( int argc, char ** argv )
                 return this->modules[j]->run( argc-2,&argv[2] );
             }
         }
+
+        error_printf( "Failed to parse argument." );
     }
 
     return 0;

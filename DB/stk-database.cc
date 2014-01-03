@@ -45,6 +45,11 @@ Database::~Database()
         stmt_tag_add = nullptr;
     }
 
+    if ( stmt_tag_get != nullptr ) {
+        sqlite3_finalize( stmt_tag_get );
+        stmt_tag_get = nullptr;
+    }
+
     if ( db_handle != nullptr ) {
         sqlite3_close( db_handle );
         db_handle = nullptr;
@@ -70,6 +75,16 @@ void Database::prepare_stmts()
     if ( retv != SQLITE_OK ) {
         fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_add_str,retv );
     }
+
+    const char * const stmt_tag_get_str = "SELECT * FROM tags WHERE name=?";
+    retv = sqlite3_prepare_v2( this->db_handle,
+                               stmt_tag_get_str, -1,
+                               &( this->stmt_tag_get ), nullptr );
+
+    if ( retv != SQLITE_OK ) {
+        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_get_str,retv );
+    }
+
 }
 
 void Database::validate_tables()
@@ -100,6 +115,28 @@ list<Type*> Database::get_types()
     types.push_back( t );
 
     return types;
+}
+
+Tag *Database::tag_get(const std::string name)
+{
+    sqlite3_bind_text( this->stmt_tag_get, 1,
+            name.c_str(), strlen( name.c_str() ), SQLITE_TRANSIENT );
+
+    int rc = sqlite3_step( this->stmt_tag_get );
+
+    if ( rc == SQLITE_ROW ) {
+        Tag *t = new Tag(
+                    sqlite3_column_int( this->stmt_tag_list, 0 ),
+                    sqlite3_column_int64( this->stmt_tag_list, 1 ),
+                    sqlite3_column_int64( this->stmt_tag_list, 2 ),
+                    name );
+
+        sqlite3_reset(this->stmt_tag_get);
+        return t;
+    }
+
+    sqlite3_reset(this->stmt_tag_get);
+    return nullptr;
 }
 
 list<Tag> Database::get_tags()
@@ -166,8 +203,3 @@ Tag *Database::tag_add( const string name )
     return new Tag( id, now, now, name );
 }
 
-Tag *Database::tag_get ( const string name )
-{
-    // TODO: get tag from db.
-    return nullptr;
-}

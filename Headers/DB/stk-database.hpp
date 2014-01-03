@@ -22,6 +22,7 @@ namespace Stuffkeeper
             /** Precompiled stmts */
             sqlite3_stmt *stmt_tag_list = nullptr;
             sqlite3_stmt *stmt_tag_add = nullptr;
+            sqlite3_stmt *stmt_tag_get = nullptr;
 
             // check, and if not exists create tables.
             void validate_tables();
