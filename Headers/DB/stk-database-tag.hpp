@@ -21,14 +21,14 @@ namespace Stuffkeeper
             std::string &get_name() {
                 return name;
             }
-            time_t get_mtime() {
+            time_t get_mtime() const {
                 return mtime;
             }
-            time_t get_ctime() {
+            time_t get_ctime() const {
                 return ctime;
             }
 
-            uint32_t get_uid() {
+            uint32_t get_uid() const {
                 return uid;
             }
 

@@ -23,6 +23,8 @@ namespace Stuffkeeper
             sqlite3_stmt *stmt_tag_list = nullptr;
             sqlite3_stmt *stmt_tag_add = nullptr;
             sqlite3_stmt *stmt_tag_get = nullptr;
+            sqlite3_stmt *stmt_tag_rename = nullptr;
+            sqlite3_stmt *stmt_tag_remove = nullptr;
 
             // check, and if not exists create tables.
             void validate_tables();
@@ -67,6 +69,10 @@ namespace Stuffkeeper
             Tag *tag_add( const std::string name );
 
             Tag *tag_get ( const std::string name );
+
+            Tag *tag_rename ( const Tag *old, const std::string new_name );
+
+            bool tag_remove ( const Tag *old );
     };
 }
 

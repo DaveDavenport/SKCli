@@ -22,7 +22,7 @@ int Tags::cmd_complete( int argc, char **argv )
 
     string command = argv[0];
 
-    if ( command == "show"  && argc == 1 ) {
+    if ( ( command == "show" || command == "rename"  )&& argc == 1 ) {
         // Print out tags.
         std::list<Tag> tags = this->cli->get_database()->get_tags();
 
@@ -100,14 +100,13 @@ int Tags::run ( int argc, char **argv )
             return this->list();
         } else if ( command == "add" ) {
             return this->add( argc-1, &argv[1] );
+        } else if ( command == "rename" ) {
+            return this->rename ( argc-1, &argv[1] );
         } else if ( command == "remove" ) {
-
+            return this->remove ( argc-1, &argv[1] );
         } else if ( command == "show" ) {
             return this->show( argc-1, &argv[1] );
-        } else if ( command == "rename" ) {
-
         }
-
     }
 
     return 0;
@@ -142,6 +141,71 @@ int Tags::show( int argc, char **argv )
     return 0;
 }
 
+
+int Tags::rename ( int argc, char **argv )
+{
+    printf( "%s[%s::%s]%s\n",
+            color_blue,
+            this->get_name().c_str(),
+            "rename",
+            color_reset );
+    putchar( '\n' );
+
+    if ( argc == 0 ) {
+        error_printf( "The new tag requires a name." );
+        return 1;
+    }
+
+    // Get tag name
+    string name = argv[0];
+
+    for ( int j=1; j < argc; j++ ) {
+        name += " "+string( argv[j] );
+    }
+
+    // Check tag
+    Tag *tag = this->cli->get_database()->tag_get( name );
+
+    if ( tag == nullptr ) {
+        error_printf( "Tag with name: '%s' not found.", name.c_str() );
+        return -1;
+    }
+
+    bool valid = false;
+    string new_name;
+
+    while ( !valid ) {
+        printf( "Enter new name (q to exit): " );
+        cin >> new_name;
+
+        if ( new_name == "q" ) {
+            delete tag;
+            return 0;
+        }
+
+        Tag *tagt = this->cli->get_database()->tag_get ( new_name );
+
+        if ( tagt == nullptr ) {
+            valid = true;
+            break;
+        }
+
+        delete tagt;
+        error_printf( "Tag with name: '%s' already exists.\n", new_name.c_str() );
+    }
+
+    Tag *t = this->cli->get_database()->tag_rename( tag, new_name );
+    if ( t == nullptr  ) {
+        error_printf( "Failed to rename tag: " );
+        fprintf( stderr, "%s->%s\n",tag->get_name().c_str(),new_name.c_str() );
+        return 1;
+    }
+
+    t->print();
+    delete t;
+    return 0;
+}
+
 int Tags::add( int argc, char **argv )
 {
     printf( "%s[%s::%s]%s\n",
@@ -158,14 +222,16 @@ int Tags::add( int argc, char **argv )
 
     // Get tag name
     string name = argv[0];
+
     for ( int j=1; j < argc; j++ ) {
         name += " "+string( argv[j] );
     }
 
     // Check tag
     Tag *test = this->cli->get_database()->tag_get( name );
-    if(test != nullptr) {
-        error_printf("Tag with name: '%s' already exists.", name.c_str());
+
+    if ( test != nullptr ) {
+        error_printf( "Tag with name: '%s' already exists.", name.c_str() );
         delete test;
         return -1;
     }
@@ -181,5 +247,60 @@ int Tags::add( int argc, char **argv )
 
     t->print();
     delete t;
+    return 0;
+}
+
+int Tags::remove ( int argc, char **argv )
+{
+    this->print_id("remove");
+    putchar( '\n' );
+
+    if ( argc == 0 ) {
+        error_printf( "The new tag requires a name." );
+        return 1;
+    }
+
+    // Get tag name
+    string name = argv[0];
+
+    for ( int j=1; j < argc; j++ ) {
+        name += " "+string( argv[j] );
+    }
+
+    // Check tag
+    Tag *tag = this->cli->get_database()->tag_get( name );
+
+    if ( tag == nullptr ) {
+        error_printf( "Tag with name: '%s' not found.", name.c_str() );
+        return -1;
+    }
+
+    // Check if tag has items.
+
+    // Double check with user.
+    bool valid = false;
+    string new_name;
+    while ( !valid ) {
+        printf( "Are you sure? (y/n): " );
+        cin >> new_name;
+
+        if ( new_name == "n" ) {
+            delete tag;
+            return 0;
+        } else if (new_name == "y" ) {
+            valid = true;
+            break;
+        }
+    }
+
+    int retv = this->cli->get_database()->tag_remove( tag );
+    if(!retv) {
+        error_printf("Failed to remove tag\n");
+        delete tag;
+        return 1;
+    } else {
+        printf("Tag: '%s' removed.\n", tag->get_name().c_str());
+    }
+    delete tag;
     return 0;
 }

@@ -50,6 +50,16 @@ Database::~Database()
         stmt_tag_get = nullptr;
     }
 
+    if ( stmt_tag_rename != nullptr ) {
+        sqlite3_finalize( stmt_tag_rename );
+        stmt_tag_rename = nullptr;
+    }
+
+    if ( stmt_tag_remove != nullptr ) {
+        sqlite3_finalize( stmt_tag_remove );
+        stmt_tag_remove = nullptr;
+    }
+
     if ( db_handle != nullptr ) {
         sqlite3_close( db_handle );
         db_handle = nullptr;
@@ -85,6 +95,23 @@ void Database::prepare_stmts()
         fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_get_str,retv );
     }
 
+    const char * const stmt_tag_rename_str = "UPDATE OR ABORT tags SET name=?,mtime=? WHERE uid=?";
+    retv = sqlite3_prepare_v2( this->db_handle,
+                               stmt_tag_rename_str, -1,
+                               &( this->stmt_tag_rename ), nullptr );
+
+    if ( retv != SQLITE_OK ) {
+        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_rename_str,retv );
+    }
+
+    const char * const stmt_tag_remove_str = "DELETE FROM tags WHERE uid=?";
+    retv = sqlite3_prepare_v2( this->db_handle,
+                               stmt_tag_remove_str, -1,
+                               &( this->stmt_tag_remove ), nullptr );
+
+    if ( retv != SQLITE_OK ) {
+        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_remove_str,retv );
+    }
 }
 
 void Database::validate_tables()
@@ -205,3 +232,39 @@ Tag *Database::tag_add( const string name )
     return new Tag( id, now, now, name );
 }
 
+Tag *Database::tag_rename ( const Tag *old, const std::string new_name )
+{
+    Tag *new_tag = nullptr;
+
+    time_t now= time( nullptr );
+    sqlite3_bind_text( this->stmt_tag_rename, 1,
+                       new_name.c_str(), strlen( new_name.c_str() ), SQLITE_TRANSIENT );
+    sqlite3_bind_int64( this->stmt_tag_rename, 2, now );
+    sqlite3_bind_int( this->stmt_tag_rename, 3, old->get_uid() );
+
+    int rc = sqlite3_step( this->stmt_tag_rename );
+    if ( rc == SQLITE_DONE ) {
+        new_tag = this->tag_get( new_name );
+    } else {
+        fprintf( stderr, "Error %d: %s\n",rc,
+                 sqlite3_errmsg( this->db_handle ) );
+    }
+
+    sqlite3_reset( this->stmt_tag_rename );
+    return new_tag;
+}
+
+
+bool Database::tag_remove ( const Tag *old )
+{
+    sqlite3_bind_int( this->stmt_tag_remove, 1, old->get_uid() );
+
+    int rc = sqlite3_step( this->stmt_tag_remove );
+    if ( rc != SQLITE_DONE ) {
+        sqlite3_reset( this->stmt_tag_remove );
+        return false;
+    }
+
+    sqlite3_reset( this->stmt_tag_remove );
+    return true;
+}

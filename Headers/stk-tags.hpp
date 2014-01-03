@@ -45,6 +45,8 @@ namespace Stuffkeeper
             int add( int argc, char **argv );
 
             int show( int argc, char **argv );
+            int rename ( int argc, char **argv );
+            int remove ( int argc, char **argv );
     };
 }
 
