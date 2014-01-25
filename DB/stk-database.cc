@@ -1,11 +1,17 @@
 #include <iostream>
 #include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <DB/stk-database.hpp>
 
 using namespace std;
 using namespace Stuffkeeper;
 
-const char* db_name = ".stuffkeeper.sqlite3";
+const char *db_name = "STKCli-DB";
+
 /**
  * Create database
  */
@@ -19,118 +25,25 @@ Database::Database()
     }
 
     ssize_t path_length = strlen( homedir )+1+strlen( db_name )+1;
-    char path[path_length];
-    snprintf( path, path_length, "%s/%s", homedir, db_name );
+    this->db_path = (char *)malloc(sizeof(char)*path_length);
+    snprintf( this->db_path, path_length, "%s/%s", homedir, db_name );
 
-    int retv = sqlite3_open( path, &this->db_handle );
 
-    if ( retv != SQLITE_OK ) {
-        fprintf( stderr, "Failed to open database: %s\n", path );
-        exit( -1 );
-    }
+    ssize_t tag_path_length = strlen("Tags")+2+path_length;
+    this->db_tag_path = (char *)malloc(sizeof(char)*tag_path_length);
+    snprintf(this->db_tag_path, tag_path_length, "%s/%s/", this->db_path, "Tags");
 
-    this->validate_tables();
-    this->prepare_stmts();
 }
 
 Database::~Database()
 {
-    if ( stmt_tag_list != nullptr ) {
-        sqlite3_finalize( stmt_tag_list );
-        stmt_tag_list = nullptr;
+    if(this->db_path) {
+        free(this->db_path);
     }
-
-    if ( stmt_tag_add != nullptr ) {
-        sqlite3_finalize( stmt_tag_add );
-        stmt_tag_add = nullptr;
-    }
-
-    if ( stmt_tag_get != nullptr ) {
-        sqlite3_finalize( stmt_tag_get );
-        stmt_tag_get = nullptr;
-    }
-
-    if ( stmt_tag_rename != nullptr ) {
-        sqlite3_finalize( stmt_tag_rename );
-        stmt_tag_rename = nullptr;
-    }
-
-    if ( stmt_tag_remove != nullptr ) {
-        sqlite3_finalize( stmt_tag_remove );
-        stmt_tag_remove = nullptr;
-    }
-
-    if ( db_handle != nullptr ) {
-        sqlite3_close( db_handle );
-        db_handle = nullptr;
+    if(this->db_tag_path) {
+        free(this->db_tag_path);
     }
 }
-
-void Database::prepare_stmts()
-{
-    const char * const stmt_tag_list_str = "SELECT * FROM tags";
-    int retv = sqlite3_prepare_v2( this->db_handle,
-                                   stmt_tag_list_str, -1,
-                                   &( this->stmt_tag_list ),nullptr );
-
-    if ( retv != SQLITE_OK ) {
-        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_list_str,retv );
-    }
-
-    const char * const stmt_tag_add_str = "INSERT INTO tags VALUES(null, ?, ?, ?)";
-    retv = sqlite3_prepare_v2( this->db_handle,
-                               stmt_tag_add_str, -1,
-                               &( this->stmt_tag_add ),nullptr );
-
-    if ( retv != SQLITE_OK ) {
-        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_add_str,retv );
-    }
-
-    const char * const stmt_tag_get_str = "SELECT * FROM tags WHERE name=?";
-    retv = sqlite3_prepare_v2( this->db_handle,
-                               stmt_tag_get_str, -1,
-                               &( this->stmt_tag_get ), nullptr );
-
-    if ( retv != SQLITE_OK ) {
-        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_get_str,retv );
-    }
-
-    const char * const stmt_tag_rename_str = "UPDATE OR ABORT tags SET name=?,mtime=? WHERE uid=?";
-    retv = sqlite3_prepare_v2( this->db_handle,
-                               stmt_tag_rename_str, -1,
-                               &( this->stmt_tag_rename ), nullptr );
-
-    if ( retv != SQLITE_OK ) {
-        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_rename_str,retv );
-    }
-
-    const char * const stmt_tag_remove_str = "DELETE FROM tags WHERE uid=?";
-    retv = sqlite3_prepare_v2( this->db_handle,
-                               stmt_tag_remove_str, -1,
-                               &( this->stmt_tag_remove ), nullptr );
-
-    if ( retv != SQLITE_OK ) {
-        fprintf( stderr, "Failed to prepare statement: %s:%i\n", stmt_tag_remove_str,retv );
-    }
-}
-
-void Database::validate_tables()
-{
-    char *errmsg = nullptr;
-    const char *stmt = "CREATE TABLE IF NOT EXISTS tags ("
-                       "uid INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,"
-                       "ctime INTEGER,"
-                       "mtime INTEGER,"
-                       "name  INTEGER UNIQUE);";
-    int retv = sqlite3_exec( this->db_handle, stmt, nullptr, nullptr, &errmsg );
-
-    if ( retv!= SQLITE_OK ) {
-        fprintf( stderr, "Failed to create table: %s\n", errmsg );
-    }
-
-
-}
-
 
 
 list<Type*> Database::get_types()
@@ -146,127 +59,102 @@ list<Type*> Database::get_types()
 
 Tag *Database::tag_get( const std::string tag_name )
 {
-    sqlite3_bind_text( this->stmt_tag_get, 1,
-                       tag_name.c_str(), strlen( tag_name.c_str() ), SQLITE_TRANSIENT );
+    ssize_t length = strlen(this->db_tag_path)+3+tag_name.length();
+    char path[length];
+    snprintf(path, length, "%s/%s", this->db_tag_path, tag_name.c_str());
 
-    int rc = sqlite3_step( this->stmt_tag_get );
+    // See if directory exists
+    struct stat test;
+    if(stat(path,&test) == -1){ 
+        return nullptr;
+    } 
 
-    if ( rc == SQLITE_ROW ) {
-        string name = reinterpret_cast<const
-                      char*>( sqlite3_column_text( this->stmt_tag_get, 3 ) );
-        Tag *t = new Tag(
-            sqlite3_column_int( this->stmt_tag_get, 0 ),
-            sqlite3_column_int64( this->stmt_tag_get, 1 ),
-            sqlite3_column_int64( this->stmt_tag_get, 2 ),
-            name );
-
-        sqlite3_reset( this->stmt_tag_get );
-        return t;
+    std::string descr;
+    length = strlen(this->db_tag_path)+3+tag_name.length()+strlen("description");
+    char buffer[length];
+    snprintf(buffer, length, "%s/%s/description", this->db_tag_path, tag_name.c_str());
+    FILE *fd = fopen(buffer, "r");
+    if(fd != nullptr) {
+        char data[1024];
+        fgets(data, 1024, fd);
+        data[strlen(data)-1] = '\0';
+        descr = data;
+        fclose(fd);
     }
-
-    sqlite3_reset( this->stmt_tag_get );
-    return nullptr;
+    return new Tag(tag_name, descr);
 }
 
 list<Tag> Database::get_tags()
 {
     list<Tag> tags;
-    int rc;
 
-    do {
-        rc = sqlite3_step( this->stmt_tag_list );
 
-        switch ( rc )  {
-            case SQLITE_DONE:
-                break;
-
-            case SQLITE_ROW: {
-                string name = reinterpret_cast<const
-                              char*>( sqlite3_column_text( this->stmt_tag_list, 3 ) );
-                Tag tag(
-                    sqlite3_column_int( this->stmt_tag_list, 0 ),
-                    sqlite3_column_int64( this->stmt_tag_list, 1 ),
-                    sqlite3_column_int64( this->stmt_tag_list, 2 ),
-                    name );
-                tags.push_back( tag );
+    DIR *tag_dir = opendir(this->db_tag_path);;
+    if(tag_dir == nullptr) {
+        fprintf(stderr, "Failed to open path: %s\n", this->db_tag_path);
+        return tags;
+    }
+    struct dirent *dir;
+    while((dir = readdir(tag_dir)))
+    {
+        if(dir->d_type == DT_DIR) {
+            if(dir->d_name[0] != '.') {
+                Tag *t = this->tag_get(dir->d_name);
+                tags.push_back(*t);
+                delete t;
             }
-            break;
-
-            default:
-                fprintf( stderr, "Error iterating table: %s\n",
-                         sqlite3_errmsg( this->db_handle ) );
-                break;
         }
+    }
 
-    } while ( rc == SQLITE_ROW );
-
-    // Reset the query.
-    sqlite3_reset( this->stmt_tag_list );
+    closedir(tag_dir);
     return tags;
 }
 
 Tag *Database::tag_add( const string name )
 {
-    time_t now = time( nullptr );
+    ssize_t length = strlen(this->db_tag_path)+2+name.length();
+    char *path = (char *)malloc(length*sizeof(char));
+    snprintf(path, length, "%s/%s", this->db_tag_path, name.c_str());
 
-    sqlite3_bind_int64( this->stmt_tag_add, 1, now );
-    sqlite3_bind_int64( this->stmt_tag_add, 2, now );
-    sqlite3_bind_text( this->stmt_tag_add, 3, name.c_str(), strlen( name.c_str() ), SQLITE_TRANSIENT );
-
-    int rc = sqlite3_step( this->stmt_tag_add );
-
-    if ( rc == SQLITE_CONSTRAINT ) {
-        return nullptr;
-    }
-
-    if ( rc != SQLITE_DONE ) {
-        fprintf( stderr, "Error %d: %s\n",rc,
-                 sqlite3_errmsg( this->db_handle ) );
-        return nullptr;
-    }
-
-    uint32_t id = sqlite3_last_insert_rowid( this->db_handle );
-
-    sqlite3_reset( stmt_tag_add );
-
-    return new Tag( id, now, now, name );
+    mkdir(path, 0700);
+    free(path);
+    return new Tag(name, "");
 }
 
 Tag *Database::tag_rename ( const Tag *old, const std::string new_name )
 {
     Tag *new_tag = nullptr;
 
-    time_t now= time( nullptr );
-    sqlite3_bind_text( this->stmt_tag_rename, 1,
-                       new_name.c_str(), strlen( new_name.c_str() ), SQLITE_TRANSIENT );
-    sqlite3_bind_int64( this->stmt_tag_rename, 2, now );
-    sqlite3_bind_int( this->stmt_tag_rename, 3, old->get_uid() );
-
-    int rc = sqlite3_step( this->stmt_tag_rename );
-
-    if ( rc == SQLITE_DONE ) {
-        new_tag = this->tag_get( new_name );
-    } else {
-        fprintf( stderr, "Error %d: %s\n",rc,
-                 sqlite3_errmsg( this->db_handle ) );
-    }
-
-    sqlite3_reset( this->stmt_tag_rename );
     return new_tag;
 }
 
 
-bool Database::tag_remove ( const Tag *old )
+bool Database::tag_remove ( Tag *old )
 {
-    sqlite3_bind_int( this->stmt_tag_remove, 1, old->get_uid() );
-
-    int rc = sqlite3_step( this->stmt_tag_remove );
-
-    if ( rc != SQLITE_DONE ) {
-        sqlite3_reset( this->stmt_tag_remove );
+    struct dirent *dir;
+    ssize_t length = strlen(this->db_tag_path)+2+old->get_name().length();
+    char path[length];
+    snprintf(path, length, "%s/%s", this->db_tag_path, old->get_name().c_str());
+    DIR *tag_dir = opendir(path);;
+    if(tag_dir == nullptr) {
+        fprintf(stderr, "Failed to open path: %s\n", this->db_tag_path);
         return false;
     }
+    while((dir = readdir(tag_dir)))
+    {
+        if(dir->d_type != DT_DIR) {
+            ssize_t str_length = strlen(this->db_tag_path)+3+
+                old->get_name().length()+strlen(dir->d_name);
+            char str_path[str_length]; 
+            snprintf(str_path, str_length, "%s/%s/%s",
+                    this->db_tag_path, old->get_name().c_str(),
+                    dir->d_name);
+            unlink(str_path);
+        }
+    }
 
-    sqlite3_reset( this->stmt_tag_remove );
+    closedir(tag_dir);
+
+    rmdir(path);
     return true;
 }

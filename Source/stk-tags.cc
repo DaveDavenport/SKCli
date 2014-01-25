@@ -56,30 +56,27 @@ int Tags::list ( )
 
     // Get the max length of the tag names.
     int name_length = 4;
+    int descr_length = strlen( "description" );
 
     for ( auto tag : tags ) {
         int l = tag.get_name().length();
 
         if ( l > name_length ) name_length = l;
+
+        l = tag.get_description().length();
+
+        if ( l > descr_length ) descr_length = l;
     }
 
 
     table_header_field_print( "%-*s", name_length,"Name" );
-    table_header_field_print( "%-*s", date_length,"Creation Time" );
-    table_header_field_print( "%-*s", date_length,"Modification Time" );
+    table_header_field_print( "%-*s", descr_length,"Description" );
     table_row_new();
 
     for ( auto tag : tags ) {
-        char buffer[64];
-        time_t t;
 
         table_field_print( "%-*s", name_length, tag.get_name().c_str() );
-        t = tag.get_ctime();
-        strftime( buffer, 64, "%x", localtime( &t ) );
-        table_field_print( "%-*s", date_length,buffer );
-        t = tag.get_mtime();
-        strftime( buffer, 64, "%x", localtime( &t ) );
-        table_field_print( "%-*s", date_length, buffer );
+        table_field_print( "%-*s", descr_length, tag.get_description().c_str() );
 
         table_row_new();
     }

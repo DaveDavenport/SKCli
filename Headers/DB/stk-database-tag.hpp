@@ -13,53 +13,38 @@ namespace Stuffkeeper
     {
         private:
             // 0 means invalid.
-            int32_t    uid = 0;
-            time_t      ctime = 0;
-            time_t      mtime = 0;
             std::string name = "n/a";
+            std::string description = "n/a";
         public:
             std::string &get_name() {
                 return name;
             }
-            time_t get_mtime() const {
-                return mtime;
-            }
-            time_t get_ctime() const {
-                return ctime;
+            std::string &get_description() {
+                return description;
             }
 
-            uint32_t get_uid() const {
-                return uid;
-            }
 
-            Tag( int32_t uid, time_t ctime, time_t mtime, std::string name ):
-                uid( uid ),
-                ctime( ctime ),
-                mtime( mtime ),
-                name( name ) {
+            Tag( std::string name, std::string description ):
+                name( name ),
+                description( description ) {
             }
             void print() {
-                char buffer[64];
-                int length = 18;
+                int length = 14;
+                unsigned long length2 = name.length();
+
+                if ( description.length() > length2 )
+                    length2 = description.length();
 
 
-                table_header_field_print( "%-*s", length, "Field" );
-                table_header_field_print( "%-*s", length, "Value" );
-                table_row_new();
-                table_field_print ( "%-*s", length, "Uid:" );
-                table_field_print ( "%-*d", length,uid );
-                table_row_new();
-                strftime( buffer, 64, "%x %X", localtime( &ctime ) );
-                table_field_print ( "%-*s", length, "Creation time:" );
-                table_field_print ( "%-*s", length,buffer );
+                table_header_field_print( "%-*s", length, "Key" );
+                table_header_field_print( "%-*s", length2, "Value" );
                 table_row_new();
 
-                strftime( buffer, 64, "%x %X", localtime( &mtime ) );
-                table_field_print ( "%-*s", length, "Modification time:" );
-                table_field_print ( "%-*s", length,buffer );
-                table_row_new();
                 table_field_print ( "%-*s", length, "Name:" );
-                table_field_print ( "%-*s", length,name.c_str() );
+                table_field_print ( "%-*s", length2, name.c_str() );
+                table_row_new();
+                table_field_print ( "%-*s", length, "Description:" );
+                table_field_print ( "%-*s", length2, description.c_str() );
                 table_row_new();
             }
 

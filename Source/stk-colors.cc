@@ -47,8 +47,8 @@ void table_header_field_print ( const char *format, ... )
 
     fputs( color_underline_bold,stdout );
     vfprintf( stdout, format, arglist );
-    fputs( color_reset,stdout );
     fputs( " ", stdout );
+    fputs( color_reset,stdout );
 
     va_end( arglist );
 }

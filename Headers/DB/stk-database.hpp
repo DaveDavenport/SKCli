@@ -17,19 +17,8 @@ namespace Stuffkeeper
     class Database
     {
         private:
-            /** Handle to the sqlite database */
-            sqlite3 *db_handle = nullptr;
-            /** Precompiled stmts */
-            sqlite3_stmt *stmt_tag_list = nullptr;
-            sqlite3_stmt *stmt_tag_add = nullptr;
-            sqlite3_stmt *stmt_tag_get = nullptr;
-            sqlite3_stmt *stmt_tag_rename = nullptr;
-            sqlite3_stmt *stmt_tag_remove = nullptr;
-
-            // check, and if not exists create tables.
-            void validate_tables();
-            // Prepare precompiled sqlite stmt.
-            void prepare_stmts();
+            char *db_path = nullptr;
+            char *db_tag_path = nullptr;
         public:
             /**
              * Constructor.
@@ -72,7 +61,7 @@ namespace Stuffkeeper
 
             Tag *tag_rename ( const Tag *old, const std::string new_name );
 
-            bool tag_remove ( const Tag *old );
+            bool tag_remove ( Tag *old );
     };
 }
 
