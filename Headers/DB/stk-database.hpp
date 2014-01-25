@@ -5,8 +5,6 @@
 #include <list>
 #include <stdint.h>
 
-// Sqlite
-#include <sqlite3.h>
 
 #include <DB/stk-database-type.hpp>
 #include <DB/stk-database-tag.hpp>

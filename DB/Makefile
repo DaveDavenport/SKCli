@@ -4,14 +4,9 @@ ifeq ($(PKG_CONFIG),$(EMPTY))
 $(error pkg-config not found.)
 endif
 
-PKG_CONFIG_VERSION=$(shell $(PKG_CONFIG) --silence-errors --modversion sqlite3)
-
-ifeq ($(PKG_CONFIG_VERSION),$(EMPTY))
-$(error sqlite3 not found) 
-endif
 
 
-CXXFLAGS+=-std=c++11 -Wall $(shell $(PKG_CONFIG) --cflags sqlite3)
+CXXFLAGS+=-std=c++11 -Wall 
 
 SOURCES=$(wildcard *.cc)
 

@@ -10,11 +10,6 @@ ifeq ($(PKG_CONFIG),$(EMPTY))
 $(error pkg-config not found.)
 endif
 
-PKG_CONFIG_VERSION=$(shell $(PKG_CONFIG) --silence-errors --modversion sqlite3)
-
-ifeq ($(PKG_CONFIG_VERSION),$(EMPTY))
-$(error sqlite3 not found) 
-endif
 
 PREFIX?=$(HOME)/.local/
 CXXFLAGS+=-std=c++11 -Wall -Wall -Wextra -g3 -Wno-unused-parameter
@@ -42,7 +37,7 @@ NODEPS:=clean doc
 ##
 CXXFLAGS+=-IHeaders/
 
-CXXLIBS+=-L$(BUILD_DIR) -lstk-db $(shell $(PKG_CONFIG) --libs sqlite3)
+CXXLIBS+=-L$(BUILD_DIR) -lstk-db
 
 
 ##
